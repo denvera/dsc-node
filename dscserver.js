@@ -27,11 +27,18 @@ var MESSAGES = {0x01:	'Enter code',
 				0x05:	'Armed'
 				}
 
+var BEEPS = {	0x06:	3,
+				0x0a:	4,
+				0x0c:	99 // Long beep	
+			}
+
 var KEYS = 	{ 'STAY':	'+',
 			  'AWAY':	',',
 			  '*':		'*',
 			  '#':		'#'
 			}
+			
+DSCServer.prototype.beeps = BEEPS;		
 			
 function DSCServer() {	
 	this.binMode = false;
@@ -116,6 +123,9 @@ function DSCServer() {
 				}
 				if (cmd == 0x05 || cmd == 0x27 || cmd == 0x0a) {
 					this.doStatusCallback(new Buffer(buf));
+					if (cmd == 0x27) {
+						this.doAnyCallback(new Buffer(buf));
+					}
 				} else {
 					if (this.checksumOk(buf)) {
 						this.doAnyCallback(new Buffer(buf));
@@ -133,6 +143,10 @@ function DSCServer() {
 		this.recvOffset += data.length;
 		this.bufLen += data.length;
 		var msgLen = this.recvBuffer[0];
+		if (msgLen == 0) {
+			log.warning("Zero length message, ignoring");
+			return;
+		}
 		while (this.bufLen >= msgLen) {
 			log.debug("Processing msg len " + msgLen + "/" + this.bufLen);				
 			this.processMsg(this.recvBuffer.slice(0, msgLen));
@@ -149,7 +163,9 @@ function DSCServer() {
 		net.createServer(function (sock) {
 			log.info('Connection from ' + sock.remoteAddress + ':'+ sock.remotePort);
 			dscServer.recvOffset = 0;
+			dscServer.binmode = false;
 			dscServer.socket = sock;
+			
 			sock.on('data', function(data) {
 				//console.log('Received: "' + data + '"');
 				if (!dscServer.binMode) {

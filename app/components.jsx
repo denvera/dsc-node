@@ -16,6 +16,7 @@ var Navbar = rb.Navbar;
 var socket = null;
 var beep = new Audio("beep-07.wav");
 
+
 function qbeep() {
   (new
 	Audio(
@@ -43,27 +44,53 @@ var StatusButtons = React.createClass({
   render: function() {
     return(
       <ButtonGroup>
-        <Button bsStyle={this.state.leds.ready}>Ready</Button>        
+        <Button bsStyle={this.state.leds.ready}>Ready</Button>
         <Button bsStyle={this.state.leds.armed}>Arm</Button>
         <Button bsStyle={this.state.leds.memory}>Memory</Button>
         <Button bsStyle={this.state.leds.bypass}>Bypass</Button>
-        <Button bsStyle={this.state.leds.trouble}>Trouble</Button>                
+        <Button bsStyle={this.state.leds.trouble}>Trouble</Button>
         <Button bsStyle={this.state.leds.program}>Program</Button>
       </ButtonGroup>
     );
   }
-  
+
 });
 
-const pageHeaderInstance = (
-   //<PageHeader>DSC Alarm <small>Control Panel</small></PageHeader>
-    <Navbar brand='DSC Control Panel'>
-    <Nav>
-     <NavItem eventKey={1} href='#'>KeyPad</NavItem>
-     <NavItem eventKey={2} href='#'>Events</NavItem>
-    </Nav>
-    </Navbar>
-);
+const NavHeader = React.createClass({
+  getInitialState: function() {
+    return({activeKey: 1});
+  },
+  handleSelect: function(selectedKey) {
+    this.setState({
+      activeKey: selectedKey
+    });
+    React.unmountComponentAtNode(document.getElementById('example'));
+    switch (selectedKey) {
+      case 1:        
+        React.render(StatusPage, document.getElementById('example'));
+        break;
+      case 2:        
+        console.log('Nav: ' + selectedKey);
+        React.render(
+          <Events/>
+          ,document.getElementById('example')
+        );
+        break;
+      case 3:
+        React.render(SettingsPage, document.getElementById('example'));            
+    } 
+  },
+  render: function() {
+    return(   
+      <Navbar brand='DSC Control Panel'>
+      <Nav activeKey={this.state.activeKey} onSelect={this.handleSelect} bsStyle='tabs'>
+       <NavItem eventKey={1} href='#'>KeyPad</NavItem>
+       <NavItem eventKey={2} href='#'>Events</NavItem>
+       <NavItem eventKey={3} href='#'>Settings</NavItem>
+      </Nav>
+      </Navbar>);
+    }
+});
 
 var KeyPad = React.createClass({
   btnClick: function(e) {
@@ -73,7 +100,7 @@ var KeyPad = React.createClass({
     qbeep();
     console.log('Click ' + e.target.innerHTML);
     socket.emit('key', e.target.innerHTML);
-    
+
   },
   render: function() {
  /*   var children = React.Children.map(this.props.children, function(c) {
@@ -83,16 +110,16 @@ var KeyPad = React.createClass({
         return React.cloneElement(c, { onClick: handleClick });
       } else {
         return c;
-      }      
+      }
     }.bind(this));
-   */ 
+   */
     return(
-      <Table>            
-      <tr><td><Button onClick={this.btnClick}>1</Button></td><td><Button onClick={this.btnClick}>2</Button></td><td><Button onClick={this.btnClick}>3</Button></td><td className="text-left"><Button onClick={this.btnClick}>Stay</Button></td></tr>
-      <tr><td><Button onClick={this.btnClick}>4</Button></td><td><Button onClick={this.btnClick}>5</Button></td><td><Button onClick={this.btnClick}>6</Button></td><td className="text-left"><Button onClick={this.btnClick}>Away</Button></td></tr>
-      <tr><td><Button onClick={this.btnClick}>7</Button></td><td><Button onClick={this.btnClick}>8</Button></td><td><Button onClick={this.btnClick}>9</Button></td><td className="text-left"><Button disabled>Exit</Button></td></tr>
-      <tr><td><Button onClick={this.btnClick}>*</Button></td><td><Button onClick={this.btnClick}>0</Button></td><td><Button onClick={this.btnClick}>#</Button></td><td className="text-left"><Button disabled>Reset</Button></td></tr>
-      <tr><td><Button onClick={this.btnClick}>F</Button></td><td><Button onClick={this.btnClick}>A</Button></td><td><Button onClick={this.btnClick}>P</Button></td><td className="text-left"><Button disabled>Chime</Button></td></tr>      
+      <Table>
+      <tr><td><Button onClick={this.btnClick}>1</Button></td><td><Button onClick={this.btnClick}>2</Button></td><td><Button onClick={this.btnClick}>3</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Stay</Button></td></tr>
+      <tr><td><Button onClick={this.btnClick}>4</Button></td><td><Button onClick={this.btnClick}>5</Button></td><td><Button onClick={this.btnClick}>6</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Away</Button></td></tr>
+      <tr><td><Button onClick={this.btnClick}>7</Button></td><td><Button onClick={this.btnClick}>8</Button></td><td><Button onClick={this.btnClick}>9</Button></td><td className="text-left"><Button style={{width:150}} disabled>Exit</Button></td></tr>
+      <tr><td><Button onClick={this.btnClick}>*</Button></td><td><Button onClick={this.btnClick}>0</Button></td><td><Button onClick={this.btnClick}>#</Button></td><td className="text-left"><Button style={{width:150}} disabled>Reset</Button></td></tr>
+      <tr><td><Button onClick={this.btnClick}>F</Button></td><td><Button onClick={this.btnClick}>A</Button></td><td><Button onClick={this.btnClick}>P</Button></td><td className="text-left"><Button style={{width:150}} disabled>Chime</Button></td></tr>
       </Table>
      );
    }
@@ -103,20 +130,21 @@ var Status = React.createClass({
     var status = {
       message: "",
     };
-    return {status: status }; 
+    return {status: status };
   },
   componentDidMount: function() {
+    socket.emit('poke', 'status');
     socket.on('status', function(status) {
       var newstatus = this.state.status;
-      if (status.msgText != undefined) { 
-        newstatus.message = status.msgText; 
-        console.log('Msg: ' + status.msgText); 
+      if (status.msgText != undefined) {
+        newstatus.message = status.msgText;
+        console.log('Msg: ' + status.msgText);
       }
-      if (status.zones != undefined) { 
+      if (status.zones != undefined) {
         newstatus.zones = status.zones;
-        console.log('Zones: ' + status.zones); 
+        console.log('Zones: ' + status.zones);
       }
-             
+
       this.setState({status : newstatus});
     }.bind(this) );
   },
@@ -127,15 +155,39 @@ var Status = React.createClass({
   }
 });
 
-function setSocket(sock) {
-  socket = sock;
- 
-  React.render(pageHeaderInstance, header);
-  
-  React.render(			
-    <Grid>
+var Events = React.createClass({
+  getInitialState: function() {
+    return {events: []};
+  },
+  componentDidMount: function() {
+    socket.on('event', function(event) {
+      console.log('New Event: ' + event);      
+      //this.state.events.unshift(event);
+      this.state.events.push(event);
+      if (this.state.events.length > 100) {
+        this.state.events.shift();
+      }
+      this.setState({events: this.state.events});                  
+    }.bind(this) );
+  },
+  render: function() {
+  var rows = [];
+  _.forEachRight(this.state.events, function(e, i) {
+    rows.push(<tr><td>{i}</td><td>{e.time}</td><td>{e.type}: 0x{e.cmd.toString(16)}</td><td>{e.body}</td></tr>);
+  });
+  return (<Table responsive>
+    <thead>
+  <tr><th>#</th><th>Time</th><th>Type</th><th>Content</th></tr>
+  {rows}
+  </thead>
+    
+  </Table>);
+  }
+});
+
+var StatusPage = (<Grid>
     <Row className='status'>
-    <Col xs={4} md={4}></Col> 
+    <Col xs={4} md={4}></Col>
     <Col xs={4} md={4}><Status/></Col>
     </Row>
     <Row className='buttons'>
@@ -143,10 +195,68 @@ function setSocket(sock) {
     </Row>
     <Row><br/></Row>
     <Row>
-    <Col xs={4} md={4}></Col>  
+    <Col xs={4} md={4}></Col>
     <Col xs={4} md={4}><div className="text-center"><KeyPad></KeyPad></div></Col>
     </Row>
-    </Grid>
+    <Row>
+      {/* <Col xs={12} md={12}><Events/></Col> */}
+    </Row>
+    </Grid>);
+
+var Upgrade = React.createClass({
+    render: function() {
+      return(
+        <Button bsStyle='danger'>Upgrade DSC Gateway Firmware</Button>
+      );
+    }
+});
+
+var Scheduler = React.createClass({
+  render: function() {
+    return(
+      <form>
+      <rb.Input type='text' placeholder='Enter schedule' ref='text-schedule' label='Enter schedule as text' />
+      </form>
+    );
+  }
+});
+
+var SettingsPage = (
+    <Grid>
+      <Row className='upgrade-row'>
+        <Col xs={12} md={12}><Upgrade/></Col>
+      </Row>
+      <Row><br/></Row>
+      <Row className='scheduler-row'>
+        <Col xs={12} md={12}><Scheduler/></Col>
+      </Row>
+    </Grid>);
+    
+
+function setSocket(sock) {
+  socket = sock;
+  socket.on('beep', function(beep) {
+    console.log('Beep: long: ' + beep.long + ' count: ' + beep.count);
+    if (beep.long) {    
+      for (var i = 0; i < 10; i++) {
+        qbeep();
+      }
+    } else {
+      var i = 0;
+      var bcnt = beeps.count;
+      function beeps() { 
+        qbeep();
+        if (i++ < bcnt) {
+          setTimeout(arguments.callee, 100);
+        }
+      }
+      setTimeout(beeps, 100);      
+    }
+  });
+  React.render(<NavHeader/>, header);
+
+  React.render(
+    StatusPage
   	,
   	document.getElementById('example')
   );
