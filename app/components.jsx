@@ -64,20 +64,23 @@ const NavHeader = React.createClass({
     this.setState({
       activeKey: selectedKey
     });
-    React.unmountComponentAtNode(document.getElementById('example'));
+    //React.unmountComponentAtNode(document.getElementById('main'));
     switch (selectedKey) {
       case 1:        
-        React.render(StatusPage, document.getElementById('example'));
+        React.render(StatusPage, document.getElementById('main'));
         break;
-      case 2:        
+      case 2:
+        console.log('Events');
+        break;
+      case 3:        
         console.log('Nav: ' + selectedKey);
         React.render(
           <Events/>
-          ,document.getElementById('example')
+          ,document.getElementById('main')
         );
         break;
-      case 3:
-        React.render(SettingsPage, document.getElementById('example'));            
+      case 4:
+        React.render(SettingsPage, document.getElementById('main'));            
     } 
   },
   render: function() {
@@ -86,7 +89,8 @@ const NavHeader = React.createClass({
       <Nav activeKey={this.state.activeKey} onSelect={this.handleSelect} bsStyle='tabs'>
        <NavItem eventKey={1} href='#'>KeyPad</NavItem>
        <NavItem eventKey={2} href='#'>Events</NavItem>
-       <NavItem eventKey={3} href='#'>Settings</NavItem>
+       <NavItem eventKey={3} href='#'>KeyBus Messages</NavItem>       
+       <NavItem eventKey={4} href='#'>Settings</NavItem>
       </Nav>
       </Navbar>);
     }
@@ -119,7 +123,7 @@ var KeyPad = React.createClass({
       <tr><td><Button onClick={this.btnClick}>4</Button></td><td><Button onClick={this.btnClick}>5</Button></td><td><Button onClick={this.btnClick}>6</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Away</Button></td></tr>
       <tr><td><Button onClick={this.btnClick}>7</Button></td><td><Button onClick={this.btnClick}>8</Button></td><td><Button onClick={this.btnClick}>9</Button></td><td className="text-left"><Button style={{width:150}} disabled>Exit</Button></td></tr>
       <tr><td><Button onClick={this.btnClick}>*</Button></td><td><Button onClick={this.btnClick}>0</Button></td><td><Button onClick={this.btnClick}>#</Button></td><td className="text-left"><Button style={{width:150}} disabled>Reset</Button></td></tr>
-      <tr><td><Button onClick={this.btnClick}>F</Button></td><td><Button onClick={this.btnClick}>A</Button></td><td><Button onClick={this.btnClick}>P</Button></td><td className="text-left"><Button style={{width:150}} disabled>Chime</Button></td></tr>
+      <tr><td><Button onClick={this.btnClick}>F</Button></td><td><Button onClick={this.btnClick}>A</Button></td><td><Button onClick={this.btnClick}>P</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Chime</Button></td></tr>
       </Table>
      );
    }
@@ -178,9 +182,8 @@ var Events = React.createClass({
   return (<Table responsive>
     <thead>
   <tr><th>#</th><th>Time</th><th>Type</th><th>Content</th></tr>
-  {rows}
   </thead>
-    
+  {rows}      
   </Table>);
   }
 });
@@ -203,20 +206,150 @@ var StatusPage = (<Grid>
     </Row>
     </Grid>);
 
+var BasicConfirm = React.createClass({
+    getInitialState() {
+      return({ showModal: true });
+    },
+    open() {
+      this.setState({ showModal: true });
+    },
+    close() {
+      this.setState({ showModal: false });
+    },
+  render() {
+    return(<rb.Modal show={this.state.showModal} onHide={this.close}>
+          <rb.Modal.Header closeButton><rb.Modal.Title>{this.props.title}</rb.Modal.Title></rb.Modal.Header>
+          <rb.Modal.Body>
+            <p>{this.props.body}</p>
+          </rb.Modal.Body>
+          <rb.Modal.Footer>
+            <Button onClick={this.props.onConfirm} bsStyle='danger'>{this.props.confirmText}</Button>
+            <Button onClick={this.props.onClose}>Close</Button>
+          </rb.Modal.Footer>
+        </rb.Modal>);
+  }
+});
+
 var Upgrade = React.createClass({
-    render: function() {
+    getInitialState() {
+      return({ showModal: false });
+    },
+    open() {
+      this.setState({ showModal: true });
+    },
+    close() {
+      this.setState({ showModal: false });
+    },
+    upgrade() {
+      socket.emit('upgrade', 'now');
+      this.setState({ showModal: false });
+    },
+    render: function() {    
       return(
-        <Button bsStyle='danger'>Upgrade DSC Gateway Firmware</Button>
+        <div>
+        <Button onClick={this.open} bsStyle='danger'>Upgrade DSC Gateway Firmware</Button>
+        <rb.Modal show={this.state.showModal} onHide={this.close}>
+          <rb.Modal.Header closeButton><rb.Modal.Title>Upgrade DSC Gateway Firmware?</rb.Modal.Title></rb.Modal.Header>
+          <rb.Modal.Body>
+            <p>This will trigger a firmware update which may brick the device</p>
+          </rb.Modal.Body>
+          <rb.Modal.Footer>
+            <Button onClick={this.upgrade} bsStyle='danger'>Upgrade Firmware</Button>
+            <Button onClick={this.close}>Close</Button>
+          </rb.Modal.Footer>
+        </rb.Modal>
+        </div>
       );
     }
 });
 
 var Scheduler = React.createClass({
+  getInitialState: function() {
+    return({ jobs: [] });
+  },
+  componentDidMount: function() {
+    socket.on('jobs', function(jobs) {
+      this.setState({ jobs: jobs });
+    }.bind(this));
+    socket.emit('poke', 'jobs'); 
+  },
+  onSubmit: function(e) {
+    e.preventDefault();
+    var job = { spec: this.refs.textschedule.getValue(),
+                name:     this.refs.jobname.getValue(),
+                action:   this.refs.action.getValue()
+               };
+    socket.emit('addjob', job, 
+                   function(success) {
+                      if (success) {
+                        var jobs = this.state.jobs;
+                        jobs.push(job);
+                        this.setState({ jobs: jobs });
+                        console.log('Added job!');
+                        this.setState({jobs: jobs});
+                      } else {
+                        console.log('Error adding job!');
+                      }          
+                   }.bind(this) );
+  },  
+  confirmDelete: function(i, e) {
+    console.log('Remove job index ' + i);
+    socket.emit('deljob', i);
+    var jobs = this.state.jobs;
+    _.pullAt(jobs, i);
+    this.setState({jobs: jobs, modal: null });
+  },
+  closeModal: function() {
+    console.log('Close modal');
+    this.setState({modal: null });
+  },  
+  confirm(i, e) {
+    var oc = function() {this.confirmDelete(i,e); }.bind(this);
+    var modal = <BasicConfirm title="Delete scheduled job?" confirmText="Delete Job" body="Delete the scheduled job?" onConfirm={oc} onClose={this.closeModal}/>
+    this.setState({modal: modal });  
+  },
   render: function() {
+    var i = 0;
+    var jobs = _.map(this.state.jobs, function(j) {
+      return(<tr key={i}><td>{i}</td><td>{j.spec}</td><td>{j.name}</td><td>{j.action}</td><td><Button onClick={this.confirm.bind(this, i)} key={i++} bsSize='small' bsStyle='danger'>Delete</Button></td></tr>);
+    }.bind(this));
+    var modal = this.state.modal ? this.state.modal : "";      
     return(
+      <div>
       <form>
-      <rb.Input type='text' placeholder='Enter schedule' ref='text-schedule' label='Enter schedule as text' />
-      </form>
+      <Table>
+      <tr>
+        <td><rb.Input type='text' placeholder='Enter schedule' ref='textschedule' label='Enter schedule as text' /></td>
+        <td><rb.Input type='text' placeholder='Enter job name' ref='jobname' label='Enter job name' /></td>
+        <td><rb.Input type='select' label='Action' placeholder='action' ref='action'>
+          <option value='arm'>Arm</option>
+          <option value='stay'>Stay</option>
+          <option value='disarm'>Disarm</option>
+        </rb.Input>
+        </td>
+      </tr>
+      </Table>
+      <div>
+      <pre>
+      *    *    *    *    *    *<br/>
+┬    ┬    ┬    ┬    ┬    ┬<br/>
+│    │    │    │    │    |<br/>
+│    │    │    │    │    └ day of week (0 - 7) (0 or 7 is Sun)<br/>
+│    │    │    │    └───── month (1 - 12)<br/>
+│    │    │    └────────── day of month (1 - 31)<br/>
+│    │    └─────────────── hour (0 - 23)<br/>
+│    └──────────────────── minute (0 - 59)<br/>
+└───────────────────────── second (0 - 59, optional)<br/>
+      </pre>
+      </div>
+      <rb.ButtonInput type='submit' onClick={this.onSubmit}>Add Scheduled Event</rb.ButtonInput>          
+      </form>                
+      <Table>
+      <thead><tr><th>#</th><th>Schedule</th><th>Name</th><th>Action</th><th>Delete</th></tr></thead>
+      {jobs}
+      </Table>
+      {modal} 
+      </div>
     );
   }
 });
@@ -258,7 +391,7 @@ function setSocket(sock) {
   React.render(
     StatusPage
   	,
-  	document.getElementById('example')
+  	document.getElementById('main')
   );
 
 }

@@ -10,8 +10,7 @@ var util 				= require('util');
 var _  				= require('lodash');
 var Storage = require('node-storage');
 
-function start(port, path) {
-	var store = new Storage('storage.json');
+function start(port, path) {	
 	dscserver.listen();
 	var app = express();
 	app.set('view engine', 'jade');
@@ -64,7 +63,21 @@ function start(port, path) {
 			log.info('Poke: ' + data);
 			if (data == 'status') {
 				dscserver.pokeStatus();
+			} else if (data == 'jobs') {
+				io.emit('jobs', dscserver.jobs);
 			}
+		});
+		socket.on('addjob', function(job, cb) {
+			log.info('Add job: ' + util.inspect(job));			
+			cb(dscserver.addJob(job.spec, job.action, job.name));
+		});
+		socket.on('deljob', function(idx) {
+			log.info('Delete job at index ' + idx);
+			dscserver.delJob(idx);
+		});
+		socket.on('upgrade', function(c) {
+			log.warn('Performing upgrade');
+			dscserver.upgrade();
 		});
 		/*socket.on('disconnect', function(socket) {
 			dscserver.statusCallback = null;

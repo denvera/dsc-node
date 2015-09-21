@@ -1,0 +1,1 @@
+{"jobs":[{"spec":"0 0 1 * * *","action":"stay","name":"Stay every night","job":{"name":"<Anonymous Job 1>","_events":{}}},{"spec":"0 0 8 * * 3","action":"disarm","name":"Disarm for the Thandi","job":{"name":"<Anonymous Job 3>","_events":{}}}]}

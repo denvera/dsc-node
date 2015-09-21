@@ -1,6 +1,7 @@
 exports.config =
   # See http://brunch.io/#documentation for docs.
   plugins:
+    off: ['jade-brunch', 'static-jade-brunch']
     react:
       transformOptions:
         # options passed through to `react-tools.main.transformWithDetails()` 
@@ -18,5 +19,5 @@ exports.config =
 
     stylesheets:
       joinTo: 'app.css'
-    templates:
-      joinTo: 'app.js'
+    #templates:
+    #  joinTo: 'app.js'
