@@ -71,7 +71,7 @@ function DSCServer() {
 						this.sendKey('AWAY');	
 				   }.bind(this),
 				  'disarm': function() {
-					  	if ((this.ledStatus && LEDS['ARMED']) == LEDS['ARMED']) {
+					  	if ((this.ledStatus & LEDS['ARMED']) == LEDS['ARMED']) {
 					  		log.info('Scheduled action disarm');
 					  		this.socket.write('WRITE: ' + dscServerConfig.code + '\n');
 						  } else {
@@ -231,9 +231,19 @@ function DSCServer() {
 		if (msgType in this.messageTypes) {
 			log.debug(this.messageTypes[msgType] + ': ' + buf.slice(2).toString('hex') + ' ' + (this.checksumOk(buf) ? '[OK]' : '[BAD]') );
 			if (msgType == 0x00 || msgType == 0x01) {
-				if (cmd == 0x05) { // 0x27 seems incorrect for LED status
+				if (cmd == 0x05 && buf.length == 9 && buf[4] != 0x00) { // 0x27 seems incorrect for LED status
+					if ((this.ledStatus & LEDS['ARMED']) ^ (buf[4] & LEDS['ARMED'])) {
+						// Armed LED status changed:
+						if (buf[4] & LEDS['ARMED']) {
+							mailer.sendMail('Alarm has been armed', 'Alarm Armed');
+						} else {
+							mailer.sendMail('Alarm has been disarmed', 'Alarm Disarmed');
+						}
+					}
 					this.ledStatus = buf[4];		
 					this.lastStatus = new Buffer(buf);			
+				} else if (cmd == 0x05) {
+					log.warn("Short status message received");
 				}
 				if (cmd == 0x05 || cmd == 0x27 || cmd == 0x0a) {
 					this.doStatusCallback(new Buffer(buf));
@@ -257,10 +267,10 @@ function DSCServer() {
 				} else if (cmd == 0x64) { // also 0xCE messages could indicate arm/disarm
 					if (buf[4] == 0x06) {
 						// armed	
-						mailer.sendMail('Alarm has been armed', 'Alarm Armed');					
+						//mailer.sendMail('Alarm has been armed', 'Alarm Armed');					
 					} else if (buf[4] == 0x0c) {
 						// disarmed
-						mailer.sendMail('Alarm has been disarmed', 'Alarm Disarmed');
+						//mailer.sendMail('Alarm has been disarmed', 'Alarm Disarmed');
 					}
 					this.doAnyCallback(new Buffer(buf));
 				} else {
@@ -334,6 +344,9 @@ function DSCServer() {
 		}).listen(dscServerConfig.port);		
 	}
 	
+	this.readDev = function(path) {
+		
+	}	
 }
 
 
