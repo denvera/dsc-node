@@ -53,7 +53,7 @@ DSCServer.prototype.beeps = BEEPS;
 function DSCServer() {	
 	this.binMode = false;
 	log.level('debug');
-	this.recvBuffer = new Buffer(1024);
+	this.recvBuffer = new Buffer(8192);
 	this.bufLen = 0;
 	this.recvOffset = 0;	
 	this.statusCallback = null;
@@ -308,7 +308,7 @@ function DSCServer() {
 			msgLen = this.recvBuffer[0]; 
 			if (msgLen == 0) {
 				log.warning("Zero length message, ignoring. Zeroing msg buffer");
-				this.recvBuffer = new Buffer(1024);
+				this.recvBuffer = new Buffer(8192);
 				return;
 			}											
 		} 
