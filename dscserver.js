@@ -1,6 +1,7 @@
 /// <reference path="typings/node/node.d.ts" />
 
 var net = require('net');
+var fs = require('fs');
 var config = require('config');
 var log = require('./logger');
 var schedule = require('node-schedule');
@@ -75,7 +76,7 @@ function DSCServer() {
 					  		log.info('Scheduled action disarm');
 					  		this.socket.write('WRITE: ' + dscServerConfig.code + '\n');
 						  } else {
-							log.warning('Not disarming already unarmed alarm');
+							log.warn('Not disarming already unarmed alarm');
 						  }
 				  }.bind(this),
 				  'stay': function() {
@@ -189,7 +190,7 @@ function DSCServer() {
 			this.store.put('jobs', this.jobs);
 			return true;
 		} else {
-			log.warning('Error adding job: [' + spec + ',' + action + ',' + name + ']');
+			log.warn('Error adding job: [' + spec + ',' + action + ',' + name + ']');
 			return false;
 		}
 		
@@ -229,27 +230,32 @@ function DSCServer() {
 		var msgType = buf[1];
 		var cmd = buf[2];
 		if (msgType in this.messageTypes) {
-			log.debug(this.messageTypes[msgType] + ': ' + buf.slice(2).toString('hex') + ' ' + (this.checksumOk(buf) ? '[OK]' : '[BAD]') );
+			log.trace(this.messageTypes[msgType] + ': ' + buf.slice(2).toString('hex') + ' ' + (this.checksumOk(buf) ? '[OK]' : '[BAD]') );
 			if (msgType == 0x00 || msgType == 0x01) {
-				if (cmd == 0x05 && buf.length == 9 && buf[4] != 0x00) { // 0x27 seems incorrect for LED status
-					if ((this.ledStatus & LEDS['ARMED']) ^ (buf[4] & LEDS['ARMED'])) {
+				if (cmd == 0x05 && buf.length >= 9 && buf[4] != 0x00) { // 0x27 seems incorrect for LED status
+					/*if ((this.ledStatus & LEDS['ARMED']) ^ (buf[4] & LEDS['ARMED'])) {
 						// Armed LED status changed:
 						if (buf[4] & LEDS['ARMED']) {
 							mailer.sendMail('Alarm has been armed', 'Alarm Armed');
 						} else {
 							mailer.sendMail('Alarm has been disarmed', 'Alarm Disarmed');
 						}
+					}*/
+					if (this.lastStatus != null && (this.lastStatus[5] ^ buf[5]) && (buf[5] == 0x08 || buf[5] == 0x3e)) {						
+						mailer.sendMail('Alarm is ' + MESSAGES[buf[5]], 'Alarm ' + MESSAGES[buf[5]]);
 					}
-					this.ledStatus = buf[4];		
-					this.lastStatus = new Buffer(buf);			
+					this.ledStatus = buf[4];									
 				} else if (cmd == 0x05) {
 					log.warn("Short status message received");
 				}
 				if (cmd == 0x05 || cmd == 0x27 || cmd == 0x0a) {
-					this.doStatusCallback(new Buffer(buf));
-					if (cmd == 0x27) {
-						this.doAnyCallback(new Buffer(buf));
+					if (this.lastStatus != null && (!this.lastStatus.equals(buf)) ) {
+						this.doStatusCallback(new Buffer(buf));
+						if (cmd == 0x27) {
+							this.doAnyCallback(new Buffer(buf));
+						}
 					}
+					this.lastStatus = new Buffer(buf);	
 				} else if (cmd == 0xbb || cmd == 0x5d) { // Alarm
 					// 0xbb is alarm
 					// 0x5d, byte 3 is zone
@@ -292,22 +298,28 @@ function DSCServer() {
 	this.recvMsg = function(data) {
 		data.copy(this.recvBuffer, this.recvOffset);		
 		this.recvOffset += data.length;
-		this.bufLen += data.length;
+		this.bufLen += data.length;				
 		var msgLen = this.recvBuffer[0];
+		//if (dscServerConfig.mode == "dev") msgLen += 1;
 		if (msgLen == 0) {
-			log.warning("Zero length message, ignoring");			
+			log.warn("Zero length message, ignoring");			
 			return;
 		}
 		while (this.bufLen >= msgLen) {
-			log.debug("Processing msg len " + msgLen + "/" + this.bufLen);				
-			this.processMsg(this.recvBuffer.slice(0, msgLen));
+			log.trace("Processing msg len " + msgLen + "/" + this.bufLen);		
+			if (dscServerConfig.mode == "dev") {												
+				this.processMsg(Buffer.concat([new Buffer([this.recvBuffer[0]+1, (this.recvBuffer[1] == 0x05) ?  0x01 : 0x00]), 
+											   this.recvBuffer.slice(1, msgLen)]));
+			} else {
+				this.processMsg(this.recvBuffer.slice(0, msgLen));
+			}
 			//this.recvBuffer = this.recvBuffer.slice(msgLen+1,this.bufLen).copy(this.recvBuffer)
 			this.recvBuffer.copy(this.recvBuffer, 0, msgLen, this.bufLen);
 			this.bufLen -= msgLen;
 			this.recvOffset -= msgLen;
 			msgLen = this.recvBuffer[0]; 
 			if (msgLen == 0) {
-				log.warning("Zero length message, ignoring. Zeroing msg buffer");
+				log.warn("Zero length message, ignoring. Zeroing msg buffer");
 				this.recvBuffer = new Buffer(8192);
 				return;
 			}											
@@ -345,7 +357,16 @@ function DSCServer() {
 	}
 	
 	this.readDev = function(path) {
-		
+		fs.open(path, 'r+', function(err, fd) {			
+			var rs = fs.createReadStream(null, {fd: fd});
+			rs.on('data', function(chunk) {
+				log.trace("Reading from dev " + path);
+				dscServer.recvMsg(chunk);
+			});
+			rs.on('end', function() {
+				log.warn('dev stream ended');
+			});
+		});
 	}	
 }
 

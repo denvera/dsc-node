@@ -4,14 +4,20 @@ var express    	= require('express');
 var http       	= require('http');
 var logger     	= require('morgan');
 var Path       	= require('path');
-var dscserver		= require ('./dscserver.js');
-var log 				= require('./logger')
-var util 				= require('util');
-var _  				= require('lodash');
+var dscserver	= require ('./dscserver.js');
+var log 		= require('./logger')
+var util 		= require('util');
+var _  			= require('lodash');
+var config 		= require('config'); 
 var Storage = require('node-storage');
 
 function start(port, path) {	
-	dscserver.listen();
+	var c = config.get('dscServer');
+	if (c.mode == "dev") {
+		dscserver.readDev("/dev/dsc_bin");
+	} else {
+		dscserver.listen();
+	}
 	var app = express();
 	app.set('view engine', 'jade');
 	app.set('views', 'app/templates');
@@ -30,7 +36,7 @@ function start(port, path) {
 	console.log("Listening on port " + port);
 
 	dscserver.statusCallback = function(status) {
-		log.info('Sending status ' + util.inspect(status));
+		log.debug('Sending status ' + util.inspect(status));
 		io.emit('status', status);
 		if (status.leds != undefined) {
 			io.emit('leds', status.leds);
