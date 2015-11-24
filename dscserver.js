@@ -49,6 +49,9 @@ var KEYS = 	{ 'STAY':	'+',
 			  '#':		'#'
 			}
 			
+var DEV_MAP = { '*': 0x0a,
+				'#': 0x0b }
+			
 DSCServer.prototype.beeps = BEEPS;		
 			
 function DSCServer() {	
@@ -60,6 +63,7 @@ function DSCServer() {
 	this.statusCallback = null;
 	this.ledStatus = 0;
 	this.socket = null;
+	this.fd = null;
 	this.lastStatus = null;
 	this.anyCallback = null;
 	this.events = [];
@@ -154,14 +158,34 @@ function DSCServer() {
 			sKey = KEYS[key.toUpperCase()];
 		}
 		log.debug('SendKey: ' + key);
-		if (sKey != null && this.socket != null) {
-			 //var sendByte = (iKey << 2) | ((((iKey >> 4) & 0x03) + ((iKey >> 2) & 0x03) + (iKey & 0x03)) & 0x03);
-			 log.debug('WRITE: ' + sKey + '\n');
-			 try {
-			 	this.socket.write('WRITE: ' + sKey + '\n');
-			 } catch (e) {
-				log.error('Error writing to socket: ' + e); 
-			 }			 
+		if (dscServerConfig.mode != "dev") {
+			if (sKey != null && this.socket != null) {
+				log.debug('WRITE: ' + sKey + '\n');
+				try {
+					this.socket.write('WRITE: ' + sKey + '\n');
+				} catch (e) {
+					log.error('Error writing to socket: ' + e); 
+				}			 
+			}
+		} else {
+			var sendBytes = _.map(sKey, function(iKey) {
+				if (!(iKey % 1 === 0)) {
+					if (iKey in DEV_MAP) {
+						iKey = DEV_MAP[iKey];
+					}  else {
+						iKey = iKey.charCodeAt();
+					}					
+				}											
+			 	return ((iKey << 2) | ((((iKey >> 4) & 0x03) + ((iKey >> 2) & 0x03) + (iKey & 0x03)) & 0x03));
+			 });
+			 var bufSendBytes = new Buffer(sendBytes); 
+			 fs.write(this.fd, bufSendBytes, 0, bufSendBytes.length, function(err, written, s) {
+				if (err != null) {
+					log.error('Error writing string: ' + err);
+				} else {
+					log.debug('Wrote ' + written + ' bytes of ' + s.length);
+				}
+			 });
 		}
 	}
 	
@@ -357,7 +381,8 @@ function DSCServer() {
 	}
 	
 	this.readDev = function(path) {
-		fs.open(path, 'r+', function(err, fd) {			
+		fs.open(path, 'r+', function(err, fd) {	
+			this.fd = fd;		
 			var rs = fs.createReadStream(null, {fd: fd});
 			rs.on('data', function(chunk) {
 				log.trace("Reading from dev " + path);
@@ -366,7 +391,7 @@ function DSCServer() {
 			rs.on('end', function() {
 				log.warn('dev stream ended');
 			});
-		});
+		}.bind(this));
 	}	
 }
 
