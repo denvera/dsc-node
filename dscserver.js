@@ -264,11 +264,12 @@ function DSCServer() {
 						} else {
 							mailer.sendMail('Alarm has been disarmed', 'Alarm Disarmed');
 						}
-					}*/
-					if (this.lastStatus != null && (this.lastStatus[5] ^ buf[5]) && (buf[5] == 0x08 || buf[5] == 0x3e)) {						
-						mailer.sendMail('Alarm is ' + MESSAGES[buf[5]], 'Alarm ' + MESSAGES[buf[5]]);
-					}
-					this.ledStatus = buf[4];									
+					} */
+                    if (this.lastStatus != null && (this.lastStatus[5] ^ buf[5]) && (buf[5] == 0x08 || buf[5] == 0x3e)) {                       
+                        mailer.sendMail('Alarm is ' + MESSAGES[buf[5]], 'Alarm ' + MESSAGES[buf[5]]);
+                    }
+					this.ledStatus = buf[4];		
+					this.lastStatus = new Buffer(buf);			
 				} else if (cmd == 0x05) {
 					log.warn("Short status message received");
 				}
