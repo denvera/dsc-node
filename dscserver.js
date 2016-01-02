@@ -56,7 +56,7 @@ DSCServer.prototype.beeps = BEEPS;
 			
 function DSCServer() {	
 	this.binMode = false;
-	log.level('debug');
+	log.level('trace');
 	this.recvBuffer = new Buffer(8192);
 	this.bufLen = 0;
 	this.recvOffset = 0;	
@@ -269,7 +269,6 @@ function DSCServer() {
                         mailer.sendMail('Alarm is ' + MESSAGES[buf[5]], 'Alarm ' + MESSAGES[buf[5]]);
                     }
 					this.ledStatus = buf[4];		
-					this.lastStatus = new Buffer(buf);			
 				} else if (cmd == 0x05) {
 					log.warn("Short status message received");
 				}
