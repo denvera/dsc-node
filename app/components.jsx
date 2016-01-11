@@ -67,25 +67,30 @@ const NavHeader = React.createClass({
         });        
         switch (selectedKey) {
             case 1:
-                React.render(StatusPage, document.getElementById('main'));
+                ReactDOM.render(StatusPage, document.getElementById('main'));
                 break;
             case 2:
                 console.log('Events');
                 break;
             case 3:
                 console.log('Nav: ' + selectedKey);
-                React.render(
+                ReactDOM.render(
                     <Events />
                     ,document.getElementById('main')
                 );
                 break;
             case 4:
-                React.render(SettingsPage, document.getElementById('main'));
+                ReactDOM.render(SettingsPage, document.getElementById('main'));
         }
     },
     render: function () {
       return (
-      <Navbar brand='DSC Control Panel'>
+        <Navbar>
+        <Navbar.Header>
+            <Navbar.Brand>
+                <a href='#'>DSC Control Panel</a>
+            </Navbar.Brand>
+        </Navbar.Header>      
       <Nav activeKey={this.state.activeKey} onSelect={this.handleSelect} bsStyle='tabs'>
        <NavItem eventKey={1} href='#'>KeyPad</NavItem>       
        <NavItem eventKey={3} href='#'>KeyBus Messages</NavItem>
@@ -127,11 +132,13 @@ var KeyPad = React.createClass({
     render: function () {
       return (
       <Table>
-      <tr><td><Button onClick={this.btnClick}>1</Button></td><td><Button onClick={this.btnClick}>2</Button></td><td><Button onClick={this.btnClick}>3</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Stay</Button></td></tr>
-      <tr><td><Button onClick={this.btnClick}>4</Button></td><td><Button onClick={this.btnClick}>5</Button></td><td><Button onClick={this.btnClick}>6</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Away</Button></td></tr>
-      <tr><td><Button onClick={this.btnClick}>7</Button></td><td><Button onClick={this.btnClick}>8</Button></td><td><Button onClick={this.btnClick}>9</Button></td><td className="text-left"><Button style={{width:150}} disabled>Exit</Button></td></tr>
-      <tr><td><Button onClick={this.btnClick}>*</Button></td><td><Button onClick={this.btnClick}>0</Button></td><td><Button onClick={this.btnClick}>#</Button></td><td className="text-left"><Button style={{width:150}} disabled>Reset</Button></td></tr>
-      <tr><td><Button onClick={this.btnClick}>F</Button></td><td><Button onClick={this.btnClick}>A</Button></td><td><Button onClick={this.btnClick}>P</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Chime</Button></td></tr>
+          <tbody>
+          <tr><td><Button onClick={this.btnClick}>1</Button></td><td><Button onClick={this.btnClick}>2</Button></td><td><Button onClick={this.btnClick}>3</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Stay</Button></td></tr>
+          <tr><td><Button onClick={this.btnClick}>4</Button></td><td><Button onClick={this.btnClick}>5</Button></td><td><Button onClick={this.btnClick}>6</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Away</Button></td></tr>
+          <tr><td><Button onClick={this.btnClick}>7</Button></td><td><Button onClick={this.btnClick}>8</Button></td><td><Button onClick={this.btnClick}>9</Button></td><td className="text-left"><Button style={{width:150}} disabled>Exit</Button></td></tr>
+          <tr><td><Button onClick={this.btnClick}>*</Button></td><td><Button onClick={this.btnClick}>0</Button></td><td><Button onClick={this.btnClick}>#</Button></td><td className="text-left"><Button style={{width:150}} disabled>Reset</Button></td></tr>
+          <tr><td><Button onClick={this.btnClick}>F</Button></td><td><Button onClick={this.btnClick}>A</Button></td><td><Button onClick={this.btnClick}>P</Button></td><td className="text-left"><Button style={{width:150}} onClick={this.btnClick}>Chime</Button></td></tr>
+          </tbody>
       </Table>
      );
     }
@@ -190,10 +197,12 @@ var Events = React.createClass({
             rows.push(<tr><td>{i}</td><td>{e.time}</td><td>{e.type}: 0x{e.cmd.toString(16)}</td><td>{e.body}</td></tr>);
         });
         return (<Table responsive>
-    <thead>
-  <tr><th>#</th><th>Time</th><th>Type</th><th>Content</th></tr>
-    </thead>
-            {rows}
+            <thead>
+                <tr><th>#</th><th>Time</th><th>Type</th><th>Content</th></tr>
+            </thead>
+            <tbody>
+                {rows}
+            </tbody>
         </Table>);
     }
 });
@@ -336,17 +345,19 @@ var Scheduler = React.createClass({
       <div>
       <form>
       <Table>
-      <tr>
-        <td><rb.Input type='text' placeholder='Enter schedule' ref='textschedule' label='Enter schedule as text' /></td>
-        <td><rb.Input type='text' placeholder='Enter job name' ref='jobname' label='Enter job name' /></td>
-        <td>
-        <rb.Input type='select' label='Action' placeholder='action' ref='action'>
-          <option value='arm'>Arm</option>
-          <option value='stay'>Stay</option>
-          <option value='disarm'>Disarm</option>
-        </rb.Input>
-        </td>
-      </tr>
+      <tbody>
+          <tr>
+            <td><rb.Input type='text' placeholder='Enter schedule' ref='textschedule' label='Enter schedule as text' /></td>
+            <td><rb.Input type='text' placeholder='Enter job name' ref='jobname' label='Enter job name' /></td>
+            <td>
+            <rb.Input type='select' label='Action' placeholder='action' ref='action'>
+              <option value='arm'>Arm</option>
+              <option value='stay'>Stay</option>
+              <option value='disarm'>Disarm</option>
+            </rb.Input>
+            </td>
+          </tr>
+      </tbody>
       </Table>
       <div>
       <pre>
@@ -364,8 +375,10 @@ var Scheduler = React.createClass({
       <rb.ButtonInput type='submit' onClick={this.onSubmit}>Add Scheduled Event</rb.ButtonInput>
       </form>
       <Table>
-      <thead><tr><th>#</th><th>Schedule</th><th>Name</th><th>Action</th><th>Delete</th></tr></thead>
-          {jobs}
+        <thead><tr><th>#</th><th>Schedule</th><th>Name</th><th>Action</th><th>Delete</th></tr></thead>
+        <tbody>
+            {jobs}
+        </tbody>
       </Table>
           {modal}
       </div>
@@ -385,6 +398,6 @@ var SettingsPage = (
     </Grid>);
 
 
-React.render(<NavHeader />, header);
-React.render(StatusPage, document.getElementById('main'));
+ReactDOM.render(<NavHeader />, header);
+ReactDOM.render(StatusPage, document.getElementById('main'));
 
