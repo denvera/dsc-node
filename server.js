@@ -25,12 +25,10 @@ function start(port, path) {
 	var io = require('socket.io')(server);
 
 
-	app.get('/', function (req, res) {
-  		//res.send('Hello World!');
+	app.get('/', function (req, res) {  		
 		res.render('index', { title: 'DSC Alarm' });
 	});
-	app.use(express.static(Path.join(__dirname, path)));
-	//app.use(express.static(__dirname));
+	app.use(express.static(Path.join(__dirname, path)));	
 	app.use(logger('dev'));
 	app.use(bodyParser.urlencoded({ extended: true }));
 	console.log("Listening on port " + port);

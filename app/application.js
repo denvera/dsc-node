@@ -2,13 +2,9 @@
 "use strict";
 
 var App = { 
-  init: function init() {       
-    var socket = io();
-    var c = require('components'); 
-    c.setSocket(socket);
-    console.log('App initialized.');
-    
-    
+  init: function init() {           
+    var c = require('components');     
+    console.log('App initialized.');        
   }
 };
 
