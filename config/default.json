@@ -1,0 +1,16 @@
+{
+	"dscServer":{
+		"mode":"socket",
+		"port":10242,
+		"code":"1234"
+	},
+	"mail": {
+		"service": "Gmail",
+		"auth": {
+			"user": "your@email.address",
+			"pass": "your_email_password"
+		},
+		"from": "Your From Name <your@email.address>",
+		"to": ["Your Recipients <recipient1@email.address"]
+	}
+}
