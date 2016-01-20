@@ -2,10 +2,11 @@
   "name": "dsc-node",
   "description": "DSC Node",
   "author": "Denver Abrey",
-  "version": "0.0.1",
+  "version": "0.0.2",
+  "license":"GPL-2.0",
   "repository": {
     "type": "git",
-    "url": ""
+    "url": "https://github.com/denvera/dsc-node"
   },
   "scripts": {
     "start": "brunch watch --server"
