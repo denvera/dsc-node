@@ -269,6 +269,7 @@ function DSCServer() {
                         mailer.sendMail('Alarm is ' + MESSAGES[buf[5]], 'Alarm ' + MESSAGES[buf[5]]);
                     }
 					this.ledStatus = buf[4];		
+					//this.lastStatus = new Buffer(buf);
 				} else if (cmd == 0x05) {
 					log.warn("Short status message received");
 				}
@@ -279,7 +280,9 @@ function DSCServer() {
 							this.doAnyCallback(new Buffer(buf));
 						}
 					}
-					this.lastStatus = new Buffer(buf);	
+                    if (cmd == 0x05) {
+    					this.lastStatus = new Buffer(buf);
+                    }
 				} else if (cmd == 0xbb || cmd == 0x5d) { // Alarm
 					// 0xbb is alarm
 					// 0x5d, byte 3 is zone
