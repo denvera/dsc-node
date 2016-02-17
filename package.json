@@ -23,7 +23,7 @@
     "less": "^2.5.1",
     "less-brunch": "^1.8.1",
     "lodash": "^3.10.1",
-    "node-schedule": "^0.6.0",
+    "node-schedule": "^1.0.0",
     "node-storage": "0.0.7",
     "nodemailer": "^2.0.0",
     "react-brunch": "^1.0.9",
