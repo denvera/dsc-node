@@ -1,4 +1,3 @@
-// User: security@alone.za.net Pass: 8DXm7Q%M
 var nodemailer = require('nodemailer');
 var config = require('config');
 // create reusable transporter object using SMTP transport
