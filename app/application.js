@@ -1,10 +1,10 @@
 /* global io */
-"use strict";
+//"use strict";
 
-var App = { 
-  init: function init() {           
-    var c = require('components');     
-    console.log('App initialized.');        
+var App = {
+  init: function init() {
+    var c = require('components');
+    console.log('App initialized.');
   }
 };
 

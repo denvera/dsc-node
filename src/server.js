@@ -8,30 +8,15 @@ var dscserver	= require ('./dscserver.js');
 var log 		= require('./logger')
 var util 		= require('util');
 var _  			= require('lodash');
-var config 		= require('config'); 
 var Storage = require('node-storage');
 
-function start(port, path) {	
-	var c = config.get('dscServer');
+function start(c, io) {
 	if (c.mode == "dev") {
 		dscserver.readDev("/dev/dsc_bin");
 	} else {
 		dscserver.listen();
 	}
-	var app = express();
-	app.set('view engine', 'jade');
-	app.set('views', 'app/templates');
-  	var server = http.createServer(app);
-	var io = require('socket.io')(server);
 
-
-	app.get('/', function (req, res) {  		
-		res.render('index', { title: 'DSC Alarm' });
-	});
-	app.use(express.static(Path.join(__dirname, path)));	
-	app.use(logger('dev'));
-	app.use(bodyParser.urlencoded({ extended: true }));
-	console.log("Listening on port " + port);
 
 	dscserver.statusCallback = function(status) {
 		log.debug('Sending status ' + util.inspect(status));
@@ -40,7 +25,7 @@ function start(port, path) {
 			io.emit('leds', status.leds);
 		}
 	}
-	
+
 	dscserver.anyCallback = function(event) {
 		var e = {};
 		e.type = dscserver.messageTypes[event[1]];
@@ -49,10 +34,10 @@ function start(port, path) {
 		e.body = _.map(event.slice(2), function(n) { return "0x"+ n.toString(16).toUpperCase() } ).join(" ");
 		io.emit('event', e);
 		if (e.cmd == 0x64) {
-			var beep = {};			
+			var beep = {};
 			beep.long = dscserver.beeps[event[4]] == 99;
 			beep.count = dscserver.beeps[event[4]];
-			io.emit('beep', beep); 			
+			io.emit('beep', beep);
 		}
 	}
 	io.on('connection', function(socket) {
@@ -63,7 +48,7 @@ function start(port, path) {
 			dscserver.sendKey(data);
 
 		});
-		socket.on('poke', function(data) { 
+		socket.on('poke', function(data) {
 			log.info('Poke: ' + data);
 			if (data == 'status') {
 				dscserver.pokeStatus();
@@ -72,7 +57,7 @@ function start(port, path) {
 			}
 		});
 		socket.on('addjob', function(job, cb) {
-			log.info('Add job: ' + util.inspect(job));			
+			log.info('Add job: ' + util.inspect(job));
 			cb(dscserver.addJob(job.spec, job.action, job.name));
 		});
 		socket.on('deljob', function(idx) {
@@ -87,13 +72,10 @@ function start(port, path) {
 			dscserver.statusCallback = null;
 		});*/
 	});
-
-
-	return server;
 }
 
-module.exports.getServer = function getServer(port, path) {
-	return start(port, path);
+module.exports.getServer = function getServer(c, io) {
+	return start(c, io);
 }
 
 //start(3333, "public");

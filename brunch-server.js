@@ -3,8 +3,8 @@
 'use strict';
 
 
-var dscapp     = require('./server.js');
-
-module.exports = function startServer(port, path, callback) {
-	dscapp.getServer(port, path).listen(port, callback);
-};
+//var dscapp     = require('./app.js');
+module.exports = require('./app.js');
+// module.exports = function startServer(port, path, callback) {
+// 	dscapp.getServer(port, path).listen(port, callback);
+// };

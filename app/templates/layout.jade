@@ -3,11 +3,12 @@ html
 head
     title= title
     link(rel='stylesheet', href='app.css')
+    link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/latest/css/bootstrap.min.css')
 body
     #header
     block content
     script(src='javascripts/vendor.js')
     script(src='javascripts/app.js')
-    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.4.6/socket.io.min.js')
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/1.7.3/socket.io.min.js')
     script.
         require('application').init();

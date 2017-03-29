@@ -1,13 +1,23 @@
 {
-  "name": "your-app",
-  "version": "0.0.2",
-  "main": "public/app.js",
-  "dependencies": {    
-    "react": "~0.14.6",
-    "react-bootstrap": "~0.28.2",
-    "bootstrap": "~3.3.6",
-    "jquery": "~2.2.0",
-    "lodash": "~3.10.1"
-  },
-  "overrides": {}
+  "name": "dsc-node",
+  "description": "DSC Node",
+  "main": "app/application.js",
+  "authors": [
+    "Denver Abrey"
+  ],
+  "license": "GPL-2.0",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.3.7",
+    "lodash": "~4.17.4",
+    "react-bootstrap": "~0.30.8"
+  }
 }

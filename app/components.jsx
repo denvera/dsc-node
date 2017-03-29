@@ -1,4 +1,9 @@
+// import 'react';
+var ReactDOM = require('react-dom');
+var React = require('react');
+var ReactBootstrap = require('react-bootstrap');
 var rb = ReactBootstrap;
+var _ = require('lodash');
 var PageHeader = ReactBootstrap.PageHeader;
 var ButtonGroup = ReactBootstrap.ButtonGroup;
 var DropdownButton = ReactBootstrap.DropdownButton;
@@ -7,14 +12,15 @@ var Button = ReactBootstrap.Button;
 var Grid = ReactBootstrap.Grid;
 var Row = ReactBootstrap.Row;
 var Col = ReactBootstrap.Col;
-var Table = rb.Table;
-var Panel = rb.Panel;
-var Nav = rb.Nav;
-var NavItem = rb.NavItem;
-var Navbar = rb.Navbar;
+var Table = ReactBootstrap.Table;
+var Panel = ReactBootstrap.Panel;
+var Nav = ReactBootstrap.Nav;
+var NavItem = ReactBootstrap.NavItem;
+var Navbar = ReactBootstrap.Navbar;
+var Modal = ReactBootstrap.Modal;
 
 var socket = null;
-var beep = new Audio("beep-07.wav");
+//var beep = new Audio("beep-07.wav");
 
 
 function qbeep() {
@@ -26,7 +32,7 @@ function qbeep() {
 
 var StatusButtons = React.createClass({
     getInitialState: function () {
-        leds = {};
+        var leds = {};
         return ({ leds: leds });
     },
     componentDidMount: function () {
@@ -64,7 +70,7 @@ const NavHeader = React.createClass({
     handleSelect: function (selectedKey) {
         this.setState({
             activeKey: selectedKey
-        });        
+        });
         switch (selectedKey) {
             case 1:
                 ReactDOM.render(StatusPage, document.getElementById('main'));
@@ -90,9 +96,9 @@ const NavHeader = React.createClass({
             <Navbar.Brand>
                 <a href='#'>DSC Control Panel</a>
             </Navbar.Brand>
-        </Navbar.Header>      
+        </Navbar.Header>
       <Nav activeKey={this.state.activeKey} onSelect={this.handleSelect} bsStyle='tabs'>
-       <NavItem eventKey={1} href='#'>KeyPad</NavItem>       
+       <NavItem eventKey={1} href='#'>KeyPad</NavItem>
        <NavItem eventKey={3} href='#'>KeyBus Messages</NavItem>
        <NavItem eventKey={4} href='#'>Settings</NavItem>
       </Nav>
@@ -236,16 +242,16 @@ var BasicConfirm = React.createClass({
         this.setState({ showModal: false });
     },
     render() {
-        return (<rb.Modal show={this.state.showModal} onHide={this.close}>
-          <rb.Modal.Header closeButton><rb.Modal.Title>{this.props.title}</rb.Modal.Title></rb.Modal.Header>
-          <rb.Modal.Body>
+        return (<Modal show={this.state.showModal} onHide={this.close}>
+          <Modal.Header closeButton><Modal.Title>{this.props.title}</Modal.Title></Modal.Header>
+          <Modal.Body>
             <p>{this.props.body}</p>
-          </rb.Modal.Body>
-          <rb.Modal.Footer>
+          </Modal.Body>
+          <Modal.Footer>
             <Button onClick={this.props.onConfirm} bsStyle='danger'>{this.props.confirmText}</Button>
             <Button onClick={this.props.onClose}>Close</Button>
-          </rb.Modal.Footer>
-        </rb.Modal>);
+          </Modal.Footer>
+        </Modal>);
     }
 });
 
@@ -297,14 +303,16 @@ var Scheduler = React.createClass({
         this.socket.emit('poke', 'jobs');
     },
     componentWillUnmount: function() {
+        this.job = {};
         this.socket.removeAllListeners('jobs');
     },
     onSubmit: function (e) {
         e.preventDefault();
+        console.log("Trying to add: spec: " + this.textschedule.value + " name: ")
         var job = {
-            spec: this.refs.textschedule.getValue(),
-            name: this.refs.jobname.getValue(),
-            action: this.refs.action.getValue()
+            spec: this.textschedule.value,
+            name: this.jobname.value,
+            action: this.action.value
         };
         this.socket.emit('addjob', job,
                        function (success) {
@@ -315,7 +323,7 @@ var Scheduler = React.createClass({
                                console.log('Added job!');
                                this.setState({ jobs: jobs });
                            } else {
-                               console.log('Error adding job!');
+                               console.log('Error adding job: ' + job + '!');
                            }
                        }.bind(this));
     },
@@ -347,14 +355,14 @@ var Scheduler = React.createClass({
       <Table>
       <tbody>
           <tr>
-            <td><rb.Input type='text' placeholder='Enter schedule' ref='textschedule' label='Enter schedule as text' /></td>
-            <td><rb.Input type='text' placeholder='Enter job name' ref='jobname' label='Enter job name' /></td>
+            <td><rb.FormControl type='text' placeholder='Enter schedule' inputRef={(textschedule) => this.textschedule = textschedule} label='Enter schedule as text' /></td>
+            <td><rb.FormControl type='text' placeholder='Enter job name' inputRef={(jobname) => this.jobname = jobname} label='Enter job name' /></td>
             <td>
-            <rb.Input type='select' label='Action' placeholder='action' ref='action'>
+            <rb.FormControl componentClass='select' label='Action' placeholder='action' inputRef={(action) => this.action = action}>
               <option value='arm'>Arm</option>
               <option value='stay'>Stay</option>
               <option value='disarm'>Disarm</option>
-            </rb.Input>
+            </rb.FormControl>
             </td>
           </tr>
       </tbody>
@@ -372,7 +380,7 @@ var Scheduler = React.createClass({
 └───────────────────────── second (0 - 59, optional)<br />
       </pre>
       </div>
-      <rb.ButtonInput type='submit' onClick={this.onSubmit}>Add Scheduled Event</rb.ButtonInput>
+      <rb.Button type='submit' onClick={this.onSubmit}>Add Scheduled Event</rb.Button>
       </form>
       <Table>
         <thead><tr><th>#</th><th>Schedule</th><th>Name</th><th>Action</th><th>Delete</th></tr></thead>
@@ -400,4 +408,3 @@ var SettingsPage = (
 
 ReactDOM.render(<NavHeader />, header);
 ReactDOM.render(StatusPage, document.getElementById('main'));
-
