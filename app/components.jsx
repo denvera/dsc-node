@@ -207,7 +207,7 @@ var Events = React.createClass({
     },
     componentWillUnmount: function() {
         this.job = {};
-        this.socket.removeAllListeners('events');
+        this.socket.removeAllListeners('event');
     },
     render: function () {
         var rows = [];
