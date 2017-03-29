@@ -48,6 +48,10 @@ var StatusButtons = React.createClass({
             this.setState({ leds: newleds });
         }.bind(this));
     },
+    componentWillUnmount: function() {
+        this.job = {};
+        this.socket.removeAllListeners('leds');
+    },
     render: function () {
         return (
       <ButtonGroup>
@@ -173,6 +177,10 @@ var Status = React.createClass({
 
             this.setState({ status: newstatus });
         }.bind(this));
+    },
+    componentWillUnmount: function() {
+        this.job = {};
+        this.socket.removeAllListeners('status');
     },
     render: function () {
         return (
