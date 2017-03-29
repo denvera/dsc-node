@@ -19,7 +19,7 @@ app.set('view engine', 'jade');
 app.set('views', 'app/templates');
 
 var server = http.createServer(app);
-var io = require('socket.io').listen(server);
+var io = require('socket.io')(server);
 
 
 app.get('/', function (req, res) {
