@@ -33,14 +33,13 @@
     "socket.io": "^1.7.3"
   },
   "devDependencies": {
+    "babel-brunch": "^6.1.1",
+    "babel-preset-react": "^6.11.1",
     "body-parser": "^1.17.1",
     "brunch": "^2.10.9",
-    "express": "^4.15.2",
-    "babel-preset-react": "^6.11.1",
-    "javascript-brunch": "^2.10.0",
-    "babel-brunch": "^6.1.1",
-    "uglify-js-brunch": "^2.10.0",
     "css-brunch": "^2.10.0",
+    "express": "^4.15.2",
+    "javascript-brunch": "^2.10.0",
     "morgan": "^1.8.1",
     "sass-brunch": "^2.10.4"
   }

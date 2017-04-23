@@ -1,27 +1,23 @@
 // import 'react';
 var ReactDOM = require('react-dom');
 var React = require('react');
-var ReactBootstrap = require('react-bootstrap');
-var rb = ReactBootstrap;
 var _ = require('lodash');
-var PageHeader = ReactBootstrap.PageHeader;
-var ButtonGroup = ReactBootstrap.ButtonGroup;
-var DropdownButton = ReactBootstrap.DropdownButton;
-var MenuItem = ReactBootstrap.MenuItem;
-var Button = ReactBootstrap.Button;
-var Grid = ReactBootstrap.Grid;
-var Row = ReactBootstrap.Row;
-var Col = ReactBootstrap.Col;
-var Table = ReactBootstrap.Table;
-var Panel = ReactBootstrap.Panel;
-var Nav = ReactBootstrap.Nav;
-var NavItem = ReactBootstrap.NavItem;
-var Navbar = ReactBootstrap.Navbar;
-var Modal = ReactBootstrap.Modal;
+var PageHeader = require('react-bootstrap/lib/PageHeader');
+var ButtonGroup = require('react-bootstrap/lib/ButtonGroup');
+var DropdownButton = require('react-bootstrap/lib/DropdownButton');
+var MenuItem = require('react-bootstrap/lib/MenuItem');
+var Button = require('react-bootstrap/lib/Button');
+var Grid = require('react-bootstrap/lib/Grid');
+var Row = require('react-bootstrap/lib/Row');
+var Col = require('react-bootstrap/lib/Col');
+var Table = require('react-bootstrap/lib/Table');
+var Panel = require('react-bootstrap/lib/Panel');
+var Nav = require('react-bootstrap/lib/Nav');
+var NavItem = require('react-bootstrap/lib/NavItem');
+var Navbar = require('react-bootstrap/lib/Navbar');
+var Modal = require('react-bootstrap/lib/Modal');
 
 var socket = null;
-//var beep = new Audio("beep-07.wav");
-
 
 function qbeep() {
     (new
