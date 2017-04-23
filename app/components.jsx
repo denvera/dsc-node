@@ -2,6 +2,7 @@
 var ReactDOM = require('react-dom');
 var React = require('react');
 var _ = require('lodash');
+
 var PageHeader = require('react-bootstrap/lib/PageHeader');
 var ButtonGroup = require('react-bootstrap/lib/ButtonGroup');
 var DropdownButton = require('react-bootstrap/lib/DropdownButton');
@@ -16,6 +17,7 @@ var Nav = require('react-bootstrap/lib/Nav');
 var NavItem = require('react-bootstrap/lib/NavItem');
 var Navbar = require('react-bootstrap/lib/Navbar');
 var Modal = require('react-bootstrap/lib/Modal');
+var FormControl = require('react-bootstrap/lib/FormControl');
 
 var socket = null;
 
@@ -284,16 +286,16 @@ var Upgrade = React.createClass({
         return (
         <div>
         <Button onClick={this.open} bsStyle='danger'>Upgrade DSC Gateway Firmware</Button>
-        <rb.Modal show={this.state.showModal} onHide={this.close}>
-          <rb.Modal.Header closeButton><rb.Modal.Title>Upgrade DSC Gateway Firmware?</rb.Modal.Title></rb.Modal.Header>
-          <rb.Modal.Body>
+        <Modal show={this.state.showModal} onHide={this.close}>
+          <Modal.Header closeButton><Modal.Title>Upgrade DSC Gateway Firmware?</Modal.Title></Modal.Header>
+          <Modal.Body>
             <p>This will trigger a firmware update which may brick the device</p>
-          </rb.Modal.Body>
-          <rb.Modal.Footer>
+          </Modal.Body>
+          <Modal.Footer>
             <Button onClick={this.upgrade} bsStyle='danger'>Upgrade Firmware</Button>
             <Button onClick={this.close}>Close</Button>
-          </rb.Modal.Footer>
-        </rb.Modal>
+          </Modal.Footer>
+        </Modal>
         </div>
       );
     }
@@ -363,14 +365,14 @@ var Scheduler = React.createClass({
       <Table>
       <tbody>
           <tr>
-            <td><rb.FormControl type='text' placeholder='Enter schedule' inputRef={(textschedule) => this.textschedule = textschedule} label='Enter schedule as text' /></td>
-            <td><rb.FormControl type='text' placeholder='Enter job name' inputRef={(jobname) => this.jobname = jobname} label='Enter job name' /></td>
+            <td><FormControl type='text' placeholder='Enter schedule' inputRef={(textschedule) => this.textschedule = textschedule} label='Enter schedule as text' /></td>
+            <td><FormControl type='text' placeholder='Enter job name' inputRef={(jobname) => this.jobname = jobname} label='Enter job name' /></td>
             <td>
-            <rb.FormControl componentClass='select' label='Action' placeholder='action' inputRef={(action) => this.action = action}>
+            <FormControl componentClass='select' label='Action' placeholder='action' inputRef={(action) => this.action = action}>
               <option value='arm'>Arm</option>
               <option value='stay'>Stay</option>
               <option value='disarm'>Disarm</option>
-            </rb.FormControl>
+            </FormControl>
             </td>
           </tr>
       </tbody>
@@ -388,7 +390,7 @@ var Scheduler = React.createClass({
 └───────────────────────── second (0 - 59, optional)<br />
       </pre>
       </div>
-      <rb.Button type='submit' onClick={this.onSubmit}>Add Scheduled Event</rb.Button>
+      <Button type='submit' onClick={this.onSubmit}>Add Scheduled Event</Button>
       </form>
       <Table>
         <thead><tr><th>#</th><th>Schedule</th><th>Name</th><th>Action</th><th>Delete</th></tr></thead>

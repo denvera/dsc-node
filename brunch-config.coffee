@@ -15,5 +15,3 @@ exports.config =
         'javascripts/vendor.js': /^(vendor|bower_components|node_modules)/
     stylesheets:
       joinTo: {'app.css': /^(vendor|bower_components|node_modules)/}
-    #templates:
-    #  joinTo: 'app.js'

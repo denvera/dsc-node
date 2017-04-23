@@ -7,6 +7,7 @@ var config 		= require('config');
 var bodyParser 	= require('body-parser');
 var logger     	= require('morgan');
 var dscapp = require('./src/server.js');
+var compression = require('compression');
 //var log 		= require('./src/logger')
 
 function getServer(path) {
@@ -14,7 +15,7 @@ function getServer(path) {
 var c = config.get('dscServer');
 
 var app = express();
-
+app.use(compression());
 app.set('view engine', 'jade');
 app.set('views', 'app/templates');
 

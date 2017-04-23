@@ -9,20 +9,15 @@
     "url": "https://github.com/denvera/dsc-node"
   },
   "scripts": {
-    "start": "brunch watch --server"
+    "start": "node app.js"
   },
   "dependencies": {
-    "auto-reload-brunch": "^2.7.1",
     "bunyan": "^1.4.0",
-    "clean-css-brunch": "^2.10.0",
-    "coffee-script-brunch": "^2.10.1",
+    "compression": "^1.6.2",
     "config": "^1.14.0",
-    "css-brunch": "^2.10.0",
     "express": "^4.15.2",
     "jade": "^1.11.0",
-    "jade-brunch": "^2.8.0",
     "less": "^2.7.2",
-    "less-brunch": "^2.10.0",
     "lodash": "^4.17.4",
     "node-schedule": "^1.2.1",
     "node-storage": "0.0.7",
@@ -33,11 +28,17 @@
     "socket.io": "^1.7.3"
   },
   "devDependencies": {
+    "uglify-js-brunch": "^2",
+    "css-brunch": "^2.10.0",
+    "less-brunch": "^2.10.0",
+    "jade-brunch": "^2.8.0",
+    "clean-css-brunch": "^2.10.0",
+    "coffee-script-brunch": "^2.10.1",
+    "auto-reload-brunch": "^2.7.1",
     "babel-brunch": "^6.1.1",
     "babel-preset-react": "^6.11.1",
     "body-parser": "^1.17.1",
     "brunch": "^2.10.9",
-    "css-brunch": "^2.10.0",
     "express": "^4.15.2",
     "javascript-brunch": "^2.10.0",
     "morgan": "^1.8.1",
