@@ -7,4 +7,18 @@ Features
 * Email notifications for arm/disarm/alarm activation events
 * Scheduler to arm/stay/disarm alarm with cron syntax
 
-Modify default.json as appropriate or add in a production/development.json file into the config directory. Install dependencies with bower/npm install and start with ```npm start``` or ```npm start | bunyan```.
+
+### Setup (from the `dsc-node` directory)
+* node.js 6.x or greater recommended
+* Install the node dependencies using `npm install` or `bower install`
+* Generate assets using `brunch build`
+ * This may require installing brunch which can be done with npm
+ * If an error is presented during the brunch build regarding `babel-preset-latest` then that may also need to be installed
+* Modify default.json as appropriate or add in a production/development.json file into the config directory.
+ * The dscserver section can have a mode of either `socket` or `dev`.
+  * `dev` mode uses [dscmod](https://github.com/denvera/dscmod) for its messages.  The user running dsc-node requires access to the decices exposed by dscmod.
+  * `socket` mode uses an ESP8266 accessible by the host running dsc-node
+* run the server using `npm start`
+
+### Acessing the server
+If you are running the server on the same machine as a web browser you can access the server using http://localhost:3333
