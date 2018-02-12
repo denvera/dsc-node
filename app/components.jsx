@@ -63,7 +63,7 @@ class StatusButtons extends React.Component {
 }
 
 class NavHeader extends React.Component {
-    state = { activeKey: 1 };    
+    state = { activeKey: 1 };
 
     handleSelect = (selectedKey) => {
         this.setState({
@@ -116,14 +116,14 @@ class KeyPad extends React.Component {
 
     }
     beep(beepInfo) {
-        console.log('Beep: long: ' + beep.long + ' count: ' + beep.count);
+        console.log('Beep: long: ' + beepInfo.long + ' count: ' + beepInfo.count);
         if (beep.long) {
             for (var i = 0; i < 10; i++) {
                 qbeep();
             }
         } else {
             var i = 0;
-            var bcnt = beeps.count;
+            var bcnt = beepInfo.count;
             function beeps() {
                 qbeep();
                 if (i++ < bcnt) {
