@@ -1,1 +1,1 @@
-{"jobs":[{"spec":"0 0 1 * * *","action":"stay","name":"Stay every night","job":{"callback":false,"name":"<Anonymous Job 1>"}},{"spec":"* * * * *","action":"arm","name":"asd","job":{"callback":false,"name":"<Anonymous Job 4>"}}]}
+{"jobs":[]}
