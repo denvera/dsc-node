@@ -117,17 +117,17 @@ class KeyPad extends React.Component {
     }
     beep(beepInfo) {
         console.log('Beep: long: ' + beepInfo.long + ' count: ' + beepInfo.count);
-        if (beep.long) {
+        if (beepInfo.long) {
             for (var i = 0; i < 10; i++) {
                 qbeep();
             }
         } else {
             var i = 0;
             var bcnt = beepInfo.count;
-            function beeps() {
+            beeps() {
                 qbeep();
                 if (i++ < bcnt) {
-                    setTimeout(arguments.callee, 100);
+                    setTimeout(beeps, 100);
                 }
             }
             setTimeout(beeps, 100);
