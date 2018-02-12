@@ -16,8 +16,10 @@ var c = config.get('dscServer');
 
 var app = express();
 app.use(compression());
-app.set('view engine', 'jade');
-app.set('views', 'app/templates');
+app.set('views', './app/views')
+//app.engine('pug', require('pug').__express)
+app.set('view engine', 'pug');
+//app.set('views', 'app/templates');
 
 var server = http.createServer(app);
 var io = require('socket.io')(server);

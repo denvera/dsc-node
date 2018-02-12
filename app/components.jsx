@@ -28,12 +28,10 @@ function qbeep() {
       )).play();
 }
 
-var StatusButtons = React.createClass({
-    getInitialState: function () {
-        var leds = {};
-        return ({ leds: leds });
-    },
-    componentDidMount: function () {
+class StatusButtons extends React.Component {
+    state = { leds: 0 };
+
+    componentDidMount() {
         this.socket = io();
         this.socket.on('leds', function (leds) {
             var newleds = {};
@@ -45,12 +43,12 @@ var StatusButtons = React.createClass({
             newleds.program = (leds & 0x20) ? "danger" : "default";
             this.setState({ leds: newleds });
         }.bind(this));
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
         this.job = {};
         this.socket.removeAllListeners('leds');
-    },
-    render: function () {
+    }
+    render() {
         return (
       <ButtonGroup>
         <Button bsStyle={this.state.leds.ready}>Ready</Button>
@@ -62,14 +60,12 @@ var StatusButtons = React.createClass({
       </ButtonGroup>
     );
     }
+}
 
-});
+class NavHeader extends React.Component {
+    state = { activeKey: 1 };    
 
-const NavHeader = React.createClass({
-    getInitialState: function () {
-        return ({ activeKey: 1 });
-    },
-    handleSelect: function (selectedKey) {
+    handleSelect = (selectedKey) => {
         this.setState({
             activeKey: selectedKey
         });
@@ -90,8 +86,8 @@ const NavHeader = React.createClass({
             case 4:
                 ReactDOM.render(SettingsPage, document.getElementById('main'));
         }
-    },
-    render: function () {
+    }
+    render() {
       return (
         <Navbar>
         <Navbar.Header>
@@ -106,20 +102,20 @@ const NavHeader = React.createClass({
       </Nav>
       </Navbar>);
     }
-});
+}
 
-var KeyPad = React.createClass({
-    componentDidMount: function () {
+class KeyPad extends React.Component {
+    componentDidMount() {
         this.socket = io();
         this.socket.on('beep', this.beep);
-    },
-    btnClick: function (e) {
+    }
+    btnClick = (e) => {
         qbeep();
         console.log('Click ' + e.target.innerHTML);
         this.socket.emit('key', e.target.innerHTML);
 
-    },
-    beep: function (beepInfo) {
+    }
+    beep(beepInfo) {
         console.log('Beep: long: ' + beep.long + ' count: ' + beep.count);
         if (beep.long) {
             for (var i = 0; i < 10; i++) {
@@ -136,8 +132,8 @@ var KeyPad = React.createClass({
             }
             setTimeout(beeps, 100);
         }
-    },
-    render: function () {
+    }
+    render() {
       return (
       <Table>
           <tbody>
@@ -150,16 +146,12 @@ var KeyPad = React.createClass({
       </Table>
      );
     }
-});
+}
 
-var Status = React.createClass({
-    getInitialState: function () {
-        var status = {
-            message: "",
-        };
-        return { status: status };
-    },
-    componentDidMount: function () {
+class Status extends React.Component {
+    state = { status: { message: "" } };
+
+    componentDidMount() {
         this.socket = io();
         this.socket.emit('poke', 'status');
         this.socket.on('status', function (status) {
@@ -175,23 +167,21 @@ var Status = React.createClass({
 
             this.setState({ status: newstatus });
         }.bind(this));
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
         this.job = {};
         this.socket.removeAllListeners('status');
-    },
-    render: function () {
+    }
+    render() {
         return (
-      <Panel><div className="text-center">{this.state.status.message + ((this.state.status.zones != undefined) ? " - " + this.state.status.zones : "")}</div></Panel>
+      <Panel><Panel.Body><div className="text-center">{this.state.status.message + ((this.state.status.zones != undefined) ? " - " + this.state.status.zones : "")}</div></Panel.Body></Panel>
     );
     }
-});
+}
 
-var Events = React.createClass({
-    getInitialState: function () {
-        return { events: [] };
-    },
-    componentDidMount: function () {
+class Events extends React.Component {
+    state = { events: [] };
+    componentDidMount() {
         this.socket = io();
         this.socket.on('event', function (event) {
             console.log('New Event: ' + event);
@@ -202,12 +192,12 @@ var Events = React.createClass({
             }
             this.setState({ events: this.state.events });
         }.bind(this));
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
         this.job = {};
         this.socket.removeAllListeners('event');
-    },
-    render: function () {
+    }
+    render() {
         var rows = [];
         _.forEachRight(this.state.events, function (e, i) {
             rows.push(<tr><td>{i}</td><td>{e.time}</td><td>{e.type}: 0x{e.cmd.toString(16)}</td><td>{e.body}</td></tr>);
@@ -221,7 +211,7 @@ var Events = React.createClass({
             </tbody>
         </Table>);
     }
-});
+}
 
 var StatusPage = (<Grid>
     <Row className='status'>
@@ -241,16 +231,15 @@ var StatusPage = (<Grid>
     </Row>
 </Grid>);
 
-var BasicConfirm = React.createClass({
-    getInitialState() {
-        return ({ showModal: true });
-    },
-    open() {
+class BasicConfirm extends React.Component {
+    state = { showModal: true };
+
+    open = () => {
         this.setState({ showModal: true });
-    },
-    close() {
+    }
+    close = () => {
         this.setState({ showModal: false });
-    },
+    }
     render() {
         return (<Modal show={this.state.showModal} onHide={this.close}>
           <Modal.Header closeButton><Modal.Title>{this.props.title}</Modal.Title></Modal.Header>
@@ -263,26 +252,24 @@ var BasicConfirm = React.createClass({
           </Modal.Footer>
         </Modal>);
     }
-});
+}
 
-var Upgrade = React.createClass({
+class Upgrade extends React.Component {
     componentDidMount() {
         this.socket = io();
-    },
-    getInitialState() {
-        return ({ showModal: false });
-    },
-    open() {
+    }
+    state = { showModal: false };
+    open = () => {
         this.setState({ showModal: true });
-    },
-    close() {
+    }
+    close = () => {
         this.setState({ showModal: false });
-    },
-    upgrade() {
+    }
+    upgrade = () => {
         this.socket.emit('upgrade', 'now');
         this.setState({ showModal: false });
-    },
-    render: function () {
+    }
+    render() {
         return (
         <div>
         <Button onClick={this.open} bsStyle='danger'>Upgrade DSC Gateway Firmware</Button>
@@ -299,24 +286,22 @@ var Upgrade = React.createClass({
         </div>
       );
     }
-});
+}
 
-var Scheduler = React.createClass({
-    getInitialState: function () {
-        return ({ jobs: [] });
-    },
-    componentDidMount: function () {
+class Scheduler extends React.Component {
+    state = { jobs: [] };
+    componentDidMount() {
         this.socket = io();
         this.socket.on('jobs', function (jobs) {
             this.setState({ jobs: jobs });
         }.bind(this));
         this.socket.emit('poke', 'jobs');
-    },
-    componentWillUnmount: function() {
+    }
+    componentWillUnmount() {
         this.job = {};
         this.socket.removeAllListeners('jobs');
-    },
-    onSubmit: function (e) {
+    }
+    onSubmit = (e) => {
         e.preventDefault();
         console.log("Trying to add: spec: " + this.textschedule.value + " name: ")
         var job = {
@@ -336,24 +321,24 @@ var Scheduler = React.createClass({
                                console.log('Error adding job: ' + job + '!');
                            }
                        }.bind(this));
-    },
-    confirmDelete: function (i, e) {
+    }
+    confirmDelete = (i, e) => {
         console.log('Remove job index ' + i);
         this.socket.emit('deljob', i);
         var jobs = this.state.jobs;
         _.pullAt(jobs, i);
         this.setState({ jobs: jobs, modal: null });
-    },
-    closeModal: function () {
+    }
+    closeModal = () => {
         console.log('Close modal');
         this.setState({ modal: null });
-    },
-    confirm(i, e) {
+    }
+    confirm = (i, e) => {
         var oc = function () { this.confirmDelete(i, e); }.bind(this);
         var modal = <BasicConfirm title="Delete scheduled job?" confirmText="Delete Job" body="Delete the scheduled job?" onConfirm={oc} onClose={this.closeModal} />
         this.setState({ modal: modal });
-    },
-    render: function () {
+    }
+    render() {
         var i = 0;
         var jobs = _.map(this.state.jobs, function (j) {
             return (<tr key={i }><td>{i}</td><td>{j.spec}</td><td>{j.name}</td><td>{j.action}</td><td><Button onClick={this.confirm.bind(this, i)} key={i++} bsSize='small' bsStyle='danger'>Delete</Button></td></tr>);
@@ -402,7 +387,7 @@ var Scheduler = React.createClass({
       </div>
     );
     }
-});
+}
 
 var SettingsPage = (
     <Grid>

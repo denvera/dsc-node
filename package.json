@@ -2,7 +2,7 @@
   "name": "dsc-node",
   "description": "DSC Node",
   "author": "Denver Abrey",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "license": "GPL-2.0",
   "repository": {
     "type": "git",
@@ -12,36 +12,37 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "bootstrap": "~3.3.7",
     "bunyan": "^1.4.0",
     "compression": "^1.6.2",
     "config": "^1.14.0",
     "express": "^4.15.2",
-    "jade": "^1.11.0",
     "less": "^2.7.2",
-    "lodash": "^4.17.4",
+    "lodash": "~4.17.4",
     "node-schedule": "^1.2.1",
     "node-storage": "0.0.7",
-    "nodemailer": "^3.1.8",
-    "react": "^15.4.2",
-    "react-bootstrap": "^0.30.8",
-    "react-dom": "^15.4.2",
-    "socket.io": "^1.7.3"
+    "nodemailer": "^4.4.2",
+    "pug": "^2.0.0-rc.4",
+    "react": "^16.2.0",
+    "react-bootstrap": "~0.32.1",
+    "react-dom": "^16.2.0",
+    "socket.io": "^2.0.4"
   },
   "devDependencies": {
-    "uglify-js-brunch": "^2",
-    "css-brunch": "^2.10.0",
-    "less-brunch": "^2.10.0",
-    "jade-brunch": "^2.8.0",
-    "clean-css-brunch": "^2.10.0",
-    "coffee-script-brunch": "^2.10.1",
     "auto-reload-brunch": "^2.7.1",
     "babel-brunch": "^6.1.1",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.11.1",
     "body-parser": "^1.17.1",
     "brunch": "^2.10.9",
-    "express": "^4.15.2",
+    "clean-css-brunch": "^2.10.0",
+    "coffee-script-brunch": "^2.10.1",
+    "css-brunch": "^2.10.0",
     "javascript-brunch": "^2.10.0",
+    "less-brunch": "^2.10.0",
     "morgan": "^1.8.1",
-    "sass-brunch": "^2.10.4"
+    "sass-brunch": "^2.10.4",
+    "uglify-js-brunch": "^2"
   }
 }

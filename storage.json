@@ -1,1 +1,1 @@
-{"jobs":[{"spec":"0 0 1 * * *","action":"stay","name":"Stay every night","job":{"callback":false,"name":"<Anonymous Job 1>"}},{"spec":"0 30 7 * * 3","action":"disarm","name":"Disarm for the Thandi","job":{"callback":false,"name":"<Anonymous Job 2>"}}]}
+{"jobs":[{"spec":"0 0 1 * * *","action":"stay","name":"Stay every night","job":{"callback":false,"name":"<Anonymous Job 1>"}},{"spec":"* * * * *","action":"arm","name":"asd","job":{"callback":false,"name":"<Anonymous Job 4>"}}]}
