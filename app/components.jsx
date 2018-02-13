@@ -124,7 +124,7 @@ class KeyPad extends React.Component {
         } else {
             var i = 0;
             var bcnt = beepInfo.count;
-            beeps() {
+            function beeps() {
                 qbeep();
                 if (i++ < bcnt) {
                     setTimeout(beeps, 100);
