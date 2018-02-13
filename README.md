@@ -18,7 +18,7 @@ Features
   * The dscserver section can have a mode of either `socket` or `dev`.
     * `dev` mode uses [dscmod](https://github.com/denvera/dscmod) for its messages.  The user running dsc-node requires access to the devices exposed by dscmod.
     * `socket` mode uses an ESP8266 accessible by the host running dsc-node
-* run the server using `npm start`
+* run the server using `yarn start`
 
 ### Acessing the server
 If you are running the server on the same machine as a web browser you can access the server using http://localhost:3333
